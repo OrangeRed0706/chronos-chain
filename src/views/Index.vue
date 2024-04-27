@@ -15,6 +15,7 @@
             :key="icon"
             :prepend-icon="icon"
             :title="text"
+            :active= "isActive(route)"
             link
             @click="() => router.push(route)"
         ></v-list-item>
@@ -32,18 +33,20 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 import {useTheme} from 'vuetify'
-import { useRouter } from "vue-router";
+import {useRouter, useRoute} from "vue-router";
 
 const theme = useTheme()
 const router = useRouter();
+const route = useRoute();
 const links = [
   ['mdi-inbox-arrow-down', 'Inbox', '/'],
-  ['mdi-send', 'Send', 'test'],
-  ['mdi-delete', 'Trash', 'test'],
-  ['mdi-alert-octagon', 'Spam', 'test'],
-  ['mdi-integrated-circuit-chip', 'Integration', 'test']
+  ['mdi-send', 'Send', '/test'],
+  ['mdi-delete', 'Trash', '/test'],
+  ['mdi-alert-octagon', 'Spam', '/test'],
+  ['mdi-integrated-circuit-chip', 'Integration', '/test']
 ]
 const drawer = ref(null)
+const isActive = (routePath: string) => route.path === routePath
 
 function toggleThemeMode() {
   const currentThemeName = theme.global.name.value;

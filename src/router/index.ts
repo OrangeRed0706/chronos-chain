@@ -1,39 +1,41 @@
 import * as VueRouter from 'vue-router';
 import Index from '../views/Index.vue'
-import Home from '../views/Home.vue'
+import inbox from '../views/Inbox.vue'
 import HelloWorld from "../views/HelloWorld.vue";
-import Login from "../views/Login.vue";
+import Login from "../views/Account/Login.vue";
 
 const routes: VueRouter.RouteRecordRaw[] = [
     {
         path: '/',
-        name: 'index',
-        component: () => Index,
+        component: () => Promise.resolve(Index),
         children: [
-            {path: "", component: () => Home},
-            {path: "/test", component: () => HelloWorld},
+            {path: "/", component: () => Promise.resolve(inbox), name: "inbox"},
+            {path: "/test", component: () => Promise.resolve(HelloWorld), name: "test"}
         ]
     },
     {
         path: "/login",
         name: "Login",
-        component: () => Login
+        component: () => Promise.resolve(Login)
     },
+    {
+        path: "/:pathMatch(.*)*",
+        name: "notFound",
+        component: () => Promise.resolve(Index)
+    }
 ]
 const router = VueRouter.createRouter({
-    history: VueRouter.createMemoryHistory(),
+    history: VueRouter.createWebHistory(),
     routes: routes,
 })
 
 router.beforeEach((to, from, next) => {
 
     console.log(`from ${from} to ${to}`)
-    const isLogin:Boolean = localStorage.token ? true : false;
-
-    if(to.path === "/login" || to.path === "/register"){
+    const isLogin: Boolean = !!localStorage.token;
+    if (to.path === "/login" || to.path === "/register") {
         next()
-    }
-    else {
+    } else {
         isLogin ? next() : next("/login")
     }
 })

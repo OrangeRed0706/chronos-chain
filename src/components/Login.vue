@@ -9,10 +9,10 @@
             <v-btn class="mt-2" type="submit" block>Login</v-btn>
             <div class="text-center mt-2">
               <span>Or login with</span>
-              <v-btn @click="loginWithGitLab" icon>
+              <v-btn @click="loginWithGitLab">
                 <v-icon>mdi-gitlab</v-icon>
               </v-btn>
-              <v-btn @click="loginWithGitHub" icon>
+              <v-btn @click="loginWithGitHub">
                 <v-icon>mdi-github</v-icon>
               </v-btn>
             </div>
@@ -25,16 +25,28 @@
 
 <script setup>
 import {ref} from 'vue'
+import { useAuthStore } from "../store";
+import router from "../router/index";
 
+const store = useAuthStore();
 const email = ref('')
 const password = ref('')
 
 const loginWithGitLab = () => {
-  // 觸發 GitLab OAuth 登入流程
+  localStorage.setItem("token", "gitlab");
+  router.push('/');
 }
 
 const loginWithGitHub = () => {
   // 觸發 GitHub OAuth 登入流程
+}
+
+</script>
+<script>
+export default {
+  components: {
+    name: 'Login',
+  }
 }
 </script>
 
