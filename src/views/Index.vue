@@ -40,7 +40,7 @@ const router = useRouter();
 const route = useRoute();
 const links = [
   ['mdi-inbox-arrow-down', 'Inbox', '/'],
-  ['mdi-send', 'Send', '/test'],
+  ['mdi-send', 'Deployment', '/deployment'],
   ['mdi-delete', 'Trash', '/test'],
   ['mdi-alert-octagon', 'Spam', '/test'],
   ['mdi-integrated-circuit-chip', 'Integration', '/test']

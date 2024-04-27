@@ -1,6 +1,7 @@
 import * as VueRouter from 'vue-router';
 import Index from '../views/Index.vue'
 import inbox from '../views/Inbox.vue'
+import deployment from '../views/Deployment.vue'
 import HelloWorld from "../views/HelloWorld.vue";
 import Login from "../views/Account/Login.vue";
 
@@ -10,7 +11,8 @@ const routes: VueRouter.RouteRecordRaw[] = [
         component: () => Promise.resolve(Index),
         children: [
             {path: "/", component: () => Promise.resolve(inbox), name: "inbox"},
-            {path: "/test", component: () => Promise.resolve(HelloWorld), name: "test"}
+            {path: "/test", component: () => Promise.resolve(HelloWorld), name: "test"},
+            {path: "/deployment", component: () => Promise.resolve(deployment), name: "deployment"}
         ]
     },
     {
