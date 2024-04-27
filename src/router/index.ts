@@ -1,14 +1,23 @@
 import * as VueRouter from 'vue-router';
+import Index from '../views/Index.vue'
+import Home from '../views/Home.vue'
+import HelloWorld from "../views/HelloWorld.vue";
+import Login from "../views/Login.vue";
 
 const routes: VueRouter.RouteRecordRaw[] = [
     {
         path: '/',
         name: 'index',
-        component: () => import('../views/Index.vue'),
+        component: () => Index,
         children: [
-            {path: "", component: () => import("../views/Home.vue")},
-            {path: "/test", component: () => import("../views/HelloWorld.vue")}
+            {path: "", component: () => Home},
+            {path: "/test", component: () => HelloWorld},
         ]
+    },
+    {
+        path: "/login",
+        name: "Login",
+        component: () => Login
     },
 ]
 const router = VueRouter.createRouter({
@@ -19,7 +28,14 @@ const router = VueRouter.createRouter({
 router.beforeEach((to, from, next) => {
 
     console.log(`from ${from} to ${to}`)
-    next();
+    const isLogin:Boolean = localStorage.token ? true : false;
+
+    if(to.path === "/login" || to.path === "/register"){
+        next()
+    }
+    else {
+        isLogin ? next() : next("/login")
+    }
 })
 
 
