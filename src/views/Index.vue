@@ -42,7 +42,7 @@ const links = [
   ['mdi-inbox-arrow-down', 'Inbox', '/'],
   ['mdi-send', 'Deployment', '/deployment'],
   ['mdi-delete', 'Trash', '/test'],
-  ['mdi-alert-octagon', 'Spam', '/test'],
+  ['mdi-source-repository-multiple', 'Repositories', '/repositories'],
   ['mdi-integrated-circuit-chip', 'Integration', '/test']
 ]
 const drawer = ref(null)
