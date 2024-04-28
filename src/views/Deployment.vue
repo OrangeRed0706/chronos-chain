@@ -24,30 +24,36 @@
       </v-row>
     </v-container>
     <v-container>
-      <transition-group name="card-list" tag="div">
-        <v-card
-            v-for="task in originalTasks"
-            :key="task.id"
-            class="mb-4"
+      <v-card
+          v-for="task in originalTasks"
+          :key="task.id"
+          class="mb-4"
+      >
+        <v-card-title>{{ task.name }}</v-card-title>
+        <v-card-text>
+          <p>ID: {{ task.id }}</p>
+          <p>Description: {{ task.description }}</p>
+          <p>Creator: {{ task.creator }}</p>
+          <p>State: {{ taskStateType[task.status] }}</p>
+          <p>Timestamp: {{ new Date(task.timestamp).toLocaleString() }}</p>
+        </v-card-text>
+        <v-progress-linear
+            v-model="task.progressPercentage"
+            color="blue-grey"
+            height="25"
         >
-          <v-card-title>{{ task.name }}</v-card-title>
-          <v-card-text>
-            <p>ID: {{ task.id }}</p>
-            <p>Description: {{ task.description }}</p>
-            <p>Creator: {{ task.creator }}</p>
-            <p>Timestamp: {{ new Date(task.timestamp).toLocaleString() }}</p>
-          </v-card-text>
-          <v-progress-linear
-              v-model="task.progressPercentage"
-              color="blue-grey"
-              height="25"
-          >
-            <template v-slot:default="{ value }">
-              <strong>{{ Math.ceil(value) }}%</strong>
-            </template>
-          </v-progress-linear>
-        </v-card>
-      </transition-group>
+          <template v-slot:default="{ value }">
+            <strong>{{ Math.ceil(value) }}%</strong>
+          </template>
+        </v-progress-linear>
+        <v-card-actions v-if="task.status === taskStateType.WaitingVerification">
+          <v-btn color="primary" @click="confirmTask(task)">Confirm</v-btn>
+        </v-card-actions>
+        <v-card-actions v-else>
+          <v-btn disabled color="primary">Confirm</v-btn>
+          <v-btn v-if="task.status !== taskStateType.Completed" color="primary" @click="retryTask(task)">Retry</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-container>
   </v-main>
 </template>
@@ -55,8 +61,9 @@
 <script setup lang="ts">
 import {axios, loading} from '../utils/http.ts';
 import * as signalr from '../utils/signalr.ts';
-import {computed, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import {taskType} from "@/utils/types.ts";
+import {taskStateType} from "../utils/enums.ts";
 
 const connection = signalr.createSignalRConnection();
 const searchUser = ref('');
@@ -67,9 +74,10 @@ signalr.registerSignalRMessageHandler(connection, 'ClientReceiveMessage', messag
   console.log(`receive message from server: ${message}`);
 });
 
+
 signalr.registerSignalRMessageHandler(connection, 'ClientReceiveTaskMessage', message => {
   const task = JSON.parse(message);
-  const existingTask = originalTasks.value.find(t => t.name === task.name);
+  const existingTask = originalTasks.value.find(t => t.id === task.id);
   if (existingTask) {
     Object.assign(existingTask, task);
   } else {
@@ -92,7 +100,7 @@ const GetTasks = async (): Promise<void> => {
 
 const CreateTaskBtn = async (): Promise<void> => {
   try {
-    const response = await axios.post('http://localhost:5178/api/deployment', {});
+    const response = await axios.post('http://localhost:5178/api/deployment/', {});
     console.log(response.status === 200 ? 'Create task successfully' : 'Failed to create task');
 
   } catch (e) {
@@ -100,13 +108,23 @@ const CreateTaskBtn = async (): Promise<void> => {
   }
 }
 
-const sortedTasks = computed(() => {
-  if (searchUser.value) {
-    searchTasks.value = originalTasks.value.filter(task => task.creator.includes(searchUser.value));
-    return [...searchTasks.value].sort((a, b) => b.timestamp - a.timestamp);
+const confirmTask = async (taskInfo: taskType): Promise<void> => {
+  try {
+    const response = await axios.put(`http://localhost:5178/api/deployment/confirm`, taskInfo)
+    console.log((response.data));
+  } catch (e) {
+    console.error(e);
   }
-  return [...originalTasks.value].sort((a, b) => b.timestamp - a.timestamp);
-});
+}
+
+const retryTask = async (taskInfo: taskType): Promise<void> => {
+  try {
+    const response = await axios.post(`http://localhost:5178/api/deployment/retry`, taskInfo)
+    console.log((response.data));
+  } catch (e) {
+    console.error(e);
+  }
+}
 
 onMounted(() => {
   GetTasks();
@@ -118,8 +136,4 @@ defineExpose({
   CreateTaskBtn
 })
 </script>
-<style scoped>
-.card-list-move {
-  transition: transform 3s;
-}
-</style>
+
