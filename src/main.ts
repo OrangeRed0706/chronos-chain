@@ -22,8 +22,8 @@ const vuetify = createVuetify({
         defaultTheme: 'dark',
     }
 })
-createApp(App)
-    .use(vuetify)
-    .use(router)
-    .use(pinia)
-    .mount('#app')
+const app = createApp(App)
+app.use(vuetify)
+app.use(router)
+app.use(pinia)
+app.mount('#app')
